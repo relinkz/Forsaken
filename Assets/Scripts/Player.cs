@@ -33,12 +33,21 @@ public class Player : MonoBehaviour
         float inAirSlowModifier = (m_inAir == false) ? 1.0f : 0.25f;
 
         m_inAir = false;
-        m_leftAnim = false;
 
 		if (velocity.magnitude < m_maxSpeed)
 		{
 			m_rigidbody.AddRelativeForce(m_appliedMoveForce * dirMod * inAirSlowModifier);
-            return;
+		}
+
+		var vel = m_rigidbody.velocity;
+        if (dir == Direction.Left && vel.x < 0.0f )
+        {
+		    m_leftAnim = true;
+        }
+
+		if (dir == Direction.Right && vel.x > 0.0f)
+		{
+			m_leftAnim = false;
 		}
 	}
 
@@ -75,13 +84,9 @@ public class Player : MonoBehaviour
     {
         HandleInput();
 
-        var vel = m_rigidbody.velocity;
-		//m_leftAnim = vel.x < 0.0f;
-
 		m_animator.SetFloat("playerSpeed", m_rigidbody.velocity.magnitude);
 
         m_spriteRenderer.flipX = m_leftAnim;
-        //m_animator.SetBool("left", m_leftAnim);
 	}
 
 	private void OnCollisionEnter2D(Collision2D collision)
