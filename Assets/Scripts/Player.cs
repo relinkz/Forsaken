@@ -1,14 +1,17 @@
+using System.Collections;
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
     Rigidbody2D m_rigidbody = null;
     Animator m_animator = null;
+    bool m_playerLostControl;
     
     [SerializeField] Vector2 m_appliedMoveForce;
     [SerializeField] Vector2 m_appliedJumpForce;
     [SerializeField] float m_maxSpeed;
     [SerializeField] float m_inAirAcc;
+    [SerializeField] Transform m_spawnPoint;
 
     bool m_inAir;
     [SerializeField] bool m_leftAnim;
@@ -17,6 +20,7 @@ public class Player : MonoBehaviour
     {
         m_rigidbody = GetComponent<Rigidbody2D>();
         m_animator = GetComponent<Animator>();
+        m_playerLostControl = false;
     }
 
     enum Direction
@@ -79,6 +83,11 @@ public class Player : MonoBehaviour
 
     void HandleInput()
     {
+        if (m_playerLostControl)
+        {
+            return;
+        }
+
         if (Input.GetKey(KeyCode.D))
         {
             HandleHorizonalMovement(Direction.Right);
@@ -105,5 +114,25 @@ public class Player : MonoBehaviour
 	{
 		m_inAir = false;
 		m_animator.SetBool("inAir", m_inAir);
+	}
+
+	private void OnTriggerEnter2D(Collider2D collision)
+	{
+        StartCoroutine(DisablePlayerAndStartAtRespawn());
+	}
+
+    IEnumerator DisablePlayerAndStartAtRespawn()
+    {
+        gameObject.GetComponent<Rigidbody2D>().Sleep();
+		m_playerLostControl = true;
+
+		yield return new WaitForSeconds(2.0f);
+
+        gameObject.transform.position = m_spawnPoint.position;
+
+		gameObject.GetComponent<Rigidbody2D>().WakeUp();
+
+		yield return new WaitForSeconds(1.0f);
+        m_playerLostControl = false;
 	}
 }
