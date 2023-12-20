@@ -76,8 +76,10 @@ public class Player : MonoBehaviour
         }
 
         m_rigidbody.AddRelativeForce(m_appliedJumpForce);
+        m_animator.SetTrigger("jump");
 
         m_inAir = true;
+        m_animator.SetBool("inAir", m_inAir);
     }
 
     void HandleInput()
@@ -101,13 +103,14 @@ public class Player : MonoBehaviour
     {
         HandleInput();
 
-		m_animator.SetFloat("playerSpeed", m_rigidbody.velocity.magnitude);
+		m_animator.SetFloat("playerSpeed", Mathf.Abs(m_rigidbody.velocity.x));
 
-        m_spriteRenderer.flipX = m_leftAnim;
+		m_spriteRenderer.flipX = m_leftAnim;
 	}
 
 	private void OnCollisionEnter2D(Collision2D collision)
 	{
 		m_inAir = false;
+		m_animator.SetBool("inAir", m_inAir);
 	}
 }
