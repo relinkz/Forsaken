@@ -5,6 +5,7 @@ public class Player : MonoBehaviour
     Rigidbody2D m_rigidbody = null;
     Animator m_animator = null;
     SpriteRenderer m_spriteRenderer = null;
+    BoxCollider2D m_boxCollider = null;
     
     [SerializeField] Vector2 m_appliedMoveForce;
     [SerializeField] Vector2 m_appliedJumpForce;
@@ -19,6 +20,7 @@ public class Player : MonoBehaviour
         m_rigidbody = GetComponent<Rigidbody2D>();
         m_animator = GetComponent<Animator>();
         m_spriteRenderer = GetComponent<SpriteRenderer>();
+        m_boxCollider = GetComponent<BoxCollider2D>();
     }
 
     enum Direction
@@ -42,12 +44,27 @@ public class Player : MonoBehaviour
 		var vel = m_rigidbody.velocity;
         if (dir == Direction.Left && vel.x < 0.0f )
         {
-		    m_leftAnim = true;
-        }
+            SwapSprite(dir);
+
+		}
 
 		if (dir == Direction.Right && vel.x > 0.0f)
 		{
-			m_leftAnim = false;
+			SwapSprite(dir);
+		}
+	}
+
+    void SwapSprite(Direction dir)
+    {
+		if (dir == Direction.Left)
+		{
+			m_boxCollider.offset = new Vector2(0.09f, m_boxCollider.offset.y);
+            m_leftAnim = true;
+		}
+		else
+		{
+			m_boxCollider.offset = new Vector2(-0.08f, m_boxCollider.offset.y);
+            m_leftAnim = false;
 		}
 	}
 
