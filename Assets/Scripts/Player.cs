@@ -4,8 +4,6 @@ public class Player : MonoBehaviour
 {
     Rigidbody2D m_rigidbody = null;
     Animator m_animator = null;
-    SpriteRenderer m_spriteRenderer = null;
-    BoxCollider2D m_boxCollider = null;
     
     [SerializeField] Vector2 m_appliedMoveForce;
     [SerializeField] Vector2 m_appliedJumpForce;
@@ -19,8 +17,6 @@ public class Player : MonoBehaviour
     {
         m_rigidbody = GetComponent<Rigidbody2D>();
         m_animator = GetComponent<Animator>();
-        m_spriteRenderer = GetComponent<SpriteRenderer>();
-        m_boxCollider = GetComponent<BoxCollider2D>();
     }
 
     enum Direction
@@ -45,7 +41,6 @@ public class Player : MonoBehaviour
         if (dir == Direction.Left && vel.x < 0.0f )
         {
             SwapSprite(dir);
-
 		}
 
 		if (dir == Direction.Right && vel.x > 0.0f)
@@ -56,15 +51,15 @@ public class Player : MonoBehaviour
 
     void SwapSprite(Direction dir)
     {
-		if (dir == Direction.Left)
+		if (dir == Direction.Left && m_leftAnim == false)
 		{
-			m_boxCollider.offset = new Vector2(0.09f, m_boxCollider.offset.y);
+            gameObject.transform.Rotate(Vector3.up, -180);
             m_leftAnim = true;
 		}
-		else
+		else if (dir == Direction.Right && m_leftAnim == true)
 		{
-			m_boxCollider.offset = new Vector2(-0.08f, m_boxCollider.offset.y);
-            m_leftAnim = false;
+			gameObject.transform.Rotate(Vector3.up, 180);
+			m_leftAnim = false;
 		}
 	}
 
@@ -104,8 +99,6 @@ public class Player : MonoBehaviour
         HandleInput();
 
 		m_animator.SetFloat("playerSpeed", Mathf.Abs(m_rigidbody.velocity.x));
-
-		m_spriteRenderer.flipX = m_leftAnim;
 	}
 
 	private void OnCollisionEnter2D(Collision2D collision)
