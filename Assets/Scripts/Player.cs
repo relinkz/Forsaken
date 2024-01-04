@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Game.Entities
 {
-	public class Player : MonoBehaviour, IKillable
+	public class Player : MonoBehaviour, IPlayer
 	{
 		Rigidbody2D m_rigidbody = null;
 		Animator m_animator = null;
@@ -13,10 +13,14 @@ namespace Game.Entities
 		[SerializeField] Vector2 m_appliedJumpForce;
 		[SerializeField] float m_maxSpeed;
 		[SerializeField] float m_inAirAcc;
+		[SerializeField] float m_knockbackForce;
 		[SerializeField] Transform m_spawnPoint;
+		[SerializeField] float m_playerControlLossOnDamageInSec = 0.2f;
+		[SerializeField] float m_invulnerabilityTimeInSec = 1.0f;
 
 		bool m_inAir;
 		bool m_shouldRespawn;
+		bool m_isInvulnerable;
 
 		[SerializeField] bool m_leftAnim;
 		// Start is called before the first frame update
@@ -26,6 +30,7 @@ namespace Game.Entities
 			m_animator = GetComponent<Animator>();
 			m_playerLostControl = false;
 			m_shouldRespawn = false;
+			m_isInvulnerable = false;
 		}
 
 		enum Direction
@@ -126,7 +131,7 @@ namespace Game.Entities
 			m_animator.SetFloat("playerSpeed", Mathf.Abs(m_rigidbody.velocity.x));
 		}
 
-		public void Kill()
+		public void Death()
 		{
 			m_rigidbody.Sleep();
 			m_playerLostControl = false;
@@ -137,9 +142,33 @@ namespace Game.Entities
 			m_shouldRespawn = true;
 		}
 
-		public void DoDamage(int dmg)
+		public void HurtPlayer(int dmg, Vector2 colDir)
 		{
-			throw new System.NotImplementedException();
+			if (dmg == -1)
+			{
+				Death();
+				return;
+			}
+
+			if (m_isInvulnerable)
+			{
+				return;
+			}
+
+			m_rigidbody.totalForce = Vector2.zero;
+			m_rigidbody.AddForce(colDir * m_knockbackForce, ForceMode2D.Impulse);
+			StartCoroutine(StartInvulnerabilityTimer());
+		}
+
+		IEnumerator StartInvulnerabilityTimer()
+		{
+			Debug.Log("Hit");
+			m_isInvulnerable = true;
+			m_playerLostControl = true;
+			yield return new WaitForSeconds(m_playerControlLossOnDamageInSec);
+			m_playerLostControl = false;
+			yield return new WaitForSeconds(m_invulnerabilityTimeInSec);
+			m_isInvulnerable = false;
 		}
 
 		IEnumerator RespawnPlayer()
