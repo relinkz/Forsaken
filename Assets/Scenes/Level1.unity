@@ -1020,6 +1020,14 @@ PrefabInstance:
       propertyPath: m_knockbackForce
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 8542371659918997245, guid: 57f0c2343dff0b447befbb00f1f26e11, type: 3}
+      propertyPath: m_invulnerabilityTimeInSec
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8542371659918997245, guid: 57f0c2343dff0b447befbb00f1f26e11, type: 3}
+      propertyPath: m_playerControlLossOnDamageInSec
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
